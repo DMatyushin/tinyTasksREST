@@ -18,9 +18,9 @@ public class MainController {
         System.out.println(taskId);
     }
 
-    @PostMapping("/del/{id}")
+    @DeleteMapping("/del/{taskId}")
     @ResponseStatus(value = HttpStatus.ACCEPTED, reason = "Data accepted")
-    public void deleteTask(@RequestParam int taskId) {
+    public void deleteTask(@PathVariable int taskId) {
         System.out.println(taskId);
     }
 
