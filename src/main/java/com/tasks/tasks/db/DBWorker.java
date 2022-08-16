@@ -1,6 +1,8 @@
 package com.tasks.tasks.db;
 
 import com.tasks.tasks.TaskItem;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,7 +18,7 @@ public class DBWorker {
     Connection conn;
 
 
-    DBWorker(String dbURL, String dbPort, String dbUsername, String dbPassword) {
+    public DBWorker(String dbURL, String dbPort, String dbUsername, String dbPassword) {
         this.dbURL = "jdbc:mysql://" + dbURL;
         this.dbPort = dbPort;
         this.dbUsername = dbUsername;
@@ -34,9 +36,9 @@ public class DBWorker {
     }
 
 
-    public ArrayList<ArrayList<String>> getDataFromDB() {
-        ArrayList<ArrayList<String>> tasksList = new ArrayList<>();
-
+    public JSONArray getDataFromDB() {
+        //ArrayList<ArrayList<String>> tasksList = new ArrayList<>();
+        JSONArray jsonArray = new JSONArray();
 
         try {
             connectToDB();
@@ -45,16 +47,30 @@ public class DBWorker {
                 Statement statement = conn.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM tasks");
 
+                int count = 0;
+
                 while(resultSet.next()) {
 
                     ArrayList<String> taskBody = new ArrayList<>();
+                    JSONObject jsonRow = new JSONObject();
+
 
                     taskBody.add(resultSet.getString(1));
                     taskBody.add(resultSet.getString(2));
                     taskBody.add(resultSet.getString(3));
                     taskBody.add(resultSet.getString(4));
+                    String tst = taskBody.toString();
 
-                    tasksList.add(taskBody);
+                    jsonRow.put("id", (resultSet.getString(1)));
+                    jsonRow.put("title", (resultSet.getString(2)));
+                    jsonRow.put("description", (resultSet.getString(3)));
+                    jsonRow.put("time", (resultSet.getString(4)));
+
+                    //jsonArray.put(taskBody.toString(), count);
+                    count++;
+                    jsonArray.put(jsonRow);
+                    //jsonArray.
+                    //tasksList.add(taskBody);
                 }
 
             }
@@ -66,7 +82,7 @@ public class DBWorker {
             System.out.println(e.getMessage());
         }
 
-        return tasksList;
+        return jsonArray;
     }
 
     public void addTaskItem(TaskItem taskItem) {
