@@ -1,15 +1,11 @@
 package com.tasks.tasks.restController;
 
-import com.tasks.tasks.TaskItem;
-import com.tasks.tasks.db.DBWorker;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.tasks.tasks.core.ModifiedTask;
+import com.tasks.tasks.core.TaskItem;
+import com.tasks.tasks.core.DBWorker;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.http.HttpHeaders;
-import java.util.ArrayList;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class MainController {
@@ -18,29 +14,62 @@ public class MainController {
 
     @GetMapping("/list")
     public String getListTasks() {
-        //JSONArray jsonArray = new JSONArray(dbWorker.getDataFromDB());
-
-
-
         return dbWorker.getDataFromDB().toString();
     }
 
-    @PutMapping("/mod/{taskId}")
-    @ResponseStatus(value = HttpStatus.ACCEPTED, reason = "Data accepted")
-    public void modifyTask(@PathVariable int taskId) {
-        System.out.println(taskId);
+    @PostMapping("/mod")
+    //@ResponseStatus(value = HttpStatus.ACCEPTED, reason = "Data accepted")
+    public void modifyTask( @RequestBody ModifiedTask modifiedTask ) {
+        if ( modifiedTask.checkObject() ) {
+            try {
+                dbWorker.modifyTaskItem(modifiedTask);
+            } catch(Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            }
+
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Object is not valid");
+        }
+
+        throw new ResponseStatusException(HttpStatus.OK);
     }
 
     @DeleteMapping("/del/{taskId}")
-    @ResponseStatus(value = HttpStatus.ACCEPTED, reason = "Data accepted")
-    public void deleteTask(@PathVariable int taskId) {
-        System.out.println(taskId);
+    //@ResponseStatus(value = HttpStatus.ACCEPTED, reason = "Data accepted")
+    public void deleteTask( @PathVariable int taskId ) {
+
+        try {
+            dbWorker.removeTaskItem(taskId);
+        } catch(Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        throw new ResponseStatusException(HttpStatus.OK);
+
     }
 
     @PostMapping("/create")
-    @ResponseStatus(value = HttpStatus.ACCEPTED, reason = "Data accepted")
-    public void createTask(@RequestBody TaskItem taskItem) {
-        System.out.println(taskItem.taskTitle + taskItem.taskDescription);
+    //@ResponseStatus(value = HttpStatus.ACCEPTED, reason = "Data accepted")
+    public void createTask( @RequestBody TaskItem taskItem ) {
+
+        if ( taskItem.taskTitle == null ) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Object is empty"
+            );
+        } else {
+            try {
+                dbWorker.addTaskItem(taskItem);
+
+            } catch(Exception e) {
+                System.out.println(e);
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Data is not valid or DB is off.");
+
+            }
+            throw new ResponseStatusException(HttpStatus.OK);
+        }
+
+
     }
 
 }
