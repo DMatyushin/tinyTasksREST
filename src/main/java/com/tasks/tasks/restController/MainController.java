@@ -3,18 +3,25 @@ package com.tasks.tasks.restController;
 import com.tasks.tasks.core.ModifiedTask;
 import com.tasks.tasks.core.TaskItem;
 import com.tasks.tasks.core.DBWorker;
+import com.tasks.tasks.core.TestTaskItem;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class MainController {
-
     DBWorker dbWorker = new DBWorker("192.168.0.160:3306/tinyTasks", "3306", "root", "bdujlygw");
 
     @GetMapping("/list")
     public String getListTasks() {
-        return dbWorker.getDataFromDB().toString();
+        String answer =  dbWorker.getDataFromDB().toString();
+        System.out.println(answer.length());
+
+        if (answer.length() == 2) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "DB Error;");
+        }
+
+        return answer;
     }
 
     @PostMapping("/mod")
