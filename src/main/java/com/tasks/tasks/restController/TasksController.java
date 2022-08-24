@@ -2,7 +2,7 @@ package com.tasks.tasks.restController;
 
 import java.util.Optional;
 import com.tasks.tasks.core.TaskRepository;
-import com.tasks.tasks.core.TestTaskItem;
+import com.tasks.tasks.core.TaskItem;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,12 +18,12 @@ public class TasksController {
     }
 
     @GetMapping("/list")
-    public Iterable<TestTaskItem> getAllTasks () {
+    public Iterable<TaskItem> getAllTasks () {
         return this.taskRepository.findAll();
     }
 
     @GetMapping("/list/{id}")
-    public Optional<TestTaskItem> getTaskById (@PathVariable("id") Integer id) {
+    public Optional<TaskItem> getTaskById ( @PathVariable("id") Integer id) {
         return this.taskRepository.findById(id);
     }
 
@@ -42,8 +42,35 @@ public class TasksController {
     }
 
     @PostMapping("/new")
-    public void addNewTask(@RequestBody TestTaskItem testTaskItem) {
-        this.taskRepository.save(testTaskItem);
-        throw new ResponseStatusException(HttpStatus.OK);
+    public void addNewTask(@RequestBody TaskItem testTaskItem) {
+        //this.taskRepository.save(testTaskItem);
+        TaskItem newTestTaskItem = this.taskRepository.save(testTaskItem);
+
+        throw new ResponseStatusException(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/mod/{id}")
+    public TaskItem updateTask( @PathVariable("id") Integer id, @RequestBody TaskItem t) {
+
+
+        Optional<TaskItem> taskToUpdateOptional = this.taskRepository.findById(id);
+        if (!taskToUpdateOptional.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            //return null;
+        }
+        TaskItem taskToUpdate = taskToUpdateOptional.get();
+
+        if (t.getTaskTitle() != null) {
+            taskToUpdate.setTaskTitle(t.getTaskTitle());
+        }
+
+        if (t.getTaskDescription() != null) {
+            taskToUpdate.setTaskDescription(t.getTaskDescription());
+        }
+
+        TaskItem updatedTaskItem = this.taskRepository.save(taskToUpdate);
+
+
+        return updatedTaskItem;
     }
 }
