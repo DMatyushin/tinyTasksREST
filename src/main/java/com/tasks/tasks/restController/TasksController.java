@@ -1,5 +1,9 @@
 package com.tasks.tasks.restController;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 import com.tasks.tasks.core.TaskRepository;
 import com.tasks.tasks.core.TaskItem;
@@ -45,6 +49,9 @@ public class TasksController {
     public void addNewTask(@RequestBody TaskItem testTaskItem) {
         //this.taskRepository.save(testTaskItem);
         TaskItem newTestTaskItem = this.taskRepository.save(testTaskItem);
+
+        long unixTime = Instant.now().getEpochSecond();
+        System.out.println(unixTime);
 
         throw new ResponseStatusException(HttpStatus.CREATED);
     }
