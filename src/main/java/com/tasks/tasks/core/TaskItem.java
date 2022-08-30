@@ -1,6 +1,7 @@
 package com.tasks.tasks.core;
 
 import javax.persistence.*;
+import java.time.Instant;
 
 @Entity
 @Table(name = "tasks")
@@ -17,7 +18,7 @@ public class TaskItem {
     private String taskDescription;
 
     @Column(name="date")
-    private int createTime;
+    private long createTime;
 
     public Integer getId() {
         return id;
@@ -43,11 +44,12 @@ public class TaskItem {
         this.taskDescription = taskDescription;
     }
 
-    public int getCreateTime() {
+    public long getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime( int createTime ) {
+    public void setCreateTime( long createTime ) {
+
         this.createTime = createTime;
     }
 }
